@@ -1,8 +1,5 @@
 package NeuralNetwork.TransferFunctions;
 
-import NeuralNetwork.NeuralNetwork;
-import NeuralNetwork.TransferFunction;
-
 /**
  * Created by charleshamesse on 16/05/16.
  */

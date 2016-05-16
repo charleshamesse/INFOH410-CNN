@@ -1,4 +1,6 @@
-package NeuralNetwork;
+package NeuralNetwork.TransferFunctions;
+
+import NeuralNetwork.NeuralNetwork;
 
 /**
  * Created by charleshamesse on 16/05/16.

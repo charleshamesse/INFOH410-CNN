@@ -1,6 +1,9 @@
 package NeuralNetwork;
 
 
+import NeuralNetwork.Layers.Layer;
+import NeuralNetwork.TransferFunctions.TransferFunction;
+
 import java.io.*;
 
 /**
@@ -8,7 +11,7 @@ import java.io.*;
  */
 
 public class NeuralNetwork implements Serializable {
-    protected double learningRate = 0.6;
+    protected double learningRate = 0.2;
     protected Layer[] layers;
     protected TransferFunction transferFunction;
 
@@ -16,30 +19,15 @@ public class NeuralNetwork implements Serializable {
     /**
      * Constructor
      *
-     * @param l array of numbers of neurons per layer
+     * @param layers Array of layers for this network
      * @param lr learning rate
-     * @param tf transfer function
      */
-    public NeuralNetwork(int[] l, double lr, TransferFunction tf)
+    public NeuralNetwork(Layer[] layers, double lr)
     {
         learningRate = lr;
-        transferFunction = tf;
+        this.layers = layers;
 
-        layers = new Layer[l.length];
-
-        for(int i = 0; i < layers.length; i++)
-        {
-            if(i != 0)
-            {
-                layers[i] = new Layer(l[i], l[i - 1]);
-            }
-            else
-            {
-                layers[i] = new Layer(l[i], 0);
-            }
-        }
     }
-
 
 
     /**
@@ -55,34 +43,34 @@ public class NeuralNetwork implements Serializable {
         int k;
         double new_value;
 
-        double output[] = new double[layers[layers.length - 1].length];
+        double output[] = new double[layers[layers.length - 1].getHeight()];
 
         // Put input
-        for(i = 0; i < layers[0].length; i++)
+        for(i = 0; i < layers[0].getHeight(); i++)
         {
-            layers[0].neurons[i].value = input[i];
+            layers[0].getNeuron(i).value = input[i];
         }
 
         // Execute - hiddens + output
         for(k = 1; k < layers.length; k++)
         {
-            for(i = 0; i < layers[k].length; i++)
+            for(i = 0; i < layers[k].getHeight(); i++)
             {
                 new_value = 0.0;
-                for(j = 0; j < layers[k - 1].length; j++)
-                    new_value += layers[k].neurons[i].weights[j] * layers[k - 1].neurons[j].value;
+                for(j = 0; j < layers[k - 1].getHeight(); j++)
+                    new_value += layers[k].getNeuron(i).weights[j] * layers[k - 1].getNeuron(j).value;
 
-                new_value += layers[k].neurons[i].bias;
+                new_value += layers[k].getNeuron(i).bias;
 
-                layers[k].neurons[i].value = transferFunction.evaluate(new_value);
+                layers[k].getNeuron(i).value = layers[k].getTransferFunction().evaluate(new_value);
             }
         }
 
 
         // Get output
-        for(i = 0; i < layers[layers.length - 1].length; i++)
+        for(i = 0; i < layers[layers.length - 1].getHeight(); i++)
         {
-            output[i] = layers[layers.length - 1].neurons[i].value;
+            output[i] = layers[layers.length - 1].getNeuron(i).value;
         }
 
         return output;
@@ -104,32 +92,32 @@ public class NeuralNetwork implements Serializable {
         double error;
         int i, j, k;
 
-        for(i = 0; i < layers[layers.length - 1].length; i++)
+        for(i = 0; i < layers[layers.length - 1].getHeight(); i++)
         {
             error = output[i] - new_output[i];
-            layers[layers.length - 1].neurons[i].delta = error * transferFunction.evaluateDerivate(new_output[i]);
+            layers[layers.length - 1].getNeuron(i).delta = error * layers[layers.length - 1].getTransferFunction().evaluateDerivate(new_output[i]);
         }
 
 
         for(k = layers.length - 2; k >= 0; k--)
         {
             // Compute layer error and delta
-            for(i = 0; i < layers[k].length; i++)
+            for(i = 0; i < layers[k].getHeight(); i++)
             {
                 error = 0.0;
-                for(j = 0; j < layers[k + 1].length; j++)
-                    error += layers[k + 1].neurons[j].delta * layers[k + 1].neurons[j].weights[i];
+                for(j = 0; j < layers[k + 1].getHeight(); j++)
+                    error += layers[k + 1].getNeuron(j).delta * layers[k + 1].getNeuron(j).weights[i];
 
-                layers[k].neurons[i].delta = error * transferFunction.evaluateDerivate(layers[k].neurons[i].value);
+                layers[k].getNeuron(i).delta = error * layers[k].getTransferFunction().evaluateDerivate(layers[k].getNeuron(i).value);
             }
 
             // Propagate
-            for(i = 0; i < layers[k + 1].length; i++)
+            for(i = 0; i < layers[k + 1].getHeight(); i++)
             {
-                for(j = 0; j < layers[k].length; j++)
-                    layers[k + 1].neurons[i].weights[j] += learningRate * layers[k + 1].neurons[i].delta *
-                            layers[k].neurons[j].value;
-                layers[k + 1].neurons[i].bias += learningRate * layers[k + 1].neurons[i].delta;
+                for(j = 0; j < layers[k].getHeight(); j++)
+                    layers[k + 1].getNeuron(i).weights[j] += learningRate * layers[k + 1].getNeuron(i).delta *
+                            layers[k].getNeuron(j).value;
+                layers[k + 1].getNeuron(i).bias += learningRate * layers[k + 1].getNeuron(i).delta;
             }
         }
 
@@ -173,9 +161,9 @@ public class NeuralNetwork implements Serializable {
 
 
     /**
-     * Carica una rete MLP da file
-     * @param path Path dal quale caricare la rete MLP
-     * @return Rete MLP caricata dal file o null
+     * Load an existing network
+     * @param path
+     * @return
      */
     public static NeuralNetwork load(String path)
     {
@@ -196,53 +184,13 @@ public class NeuralNetwork implements Serializable {
         }
     }
 
-
-
-    /**
-     * @return Costante di apprendimento
-     */
     public double getLearningRate()
     {
         return learningRate;
     }
-
-
-    /**
-     *
-     * @param rate
-     */
     public void	setLearningRate(double rate)
     {
         learningRate = rate;
     }
 
-
-    /**
-     * Imposta una nuova funzione di trasferimento
-     *
-     * @param fun Funzione di trasferimento
-     */
-    public void setTransferFunction(TransferFunction fun)
-    {
-        transferFunction = fun;
-    }
-
-
-
-    /**
-     * @return Dimensione layer di input
-     */
-    public int getInputLayerSize()
-    {
-        return layers[0].length;
-    }
-
-
-    /**
-     * @return Dimensione layer di output
-     */
-    public int getOutputLayerSize()
-    {
-        return layers[layers.length - 1].length;
-    }
 }
