@@ -1,0 +1,9 @@
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:controller="infoh410.MainController"
+            xmlns:fx="http://javafx.com/fxml">
+    <children>
+    <TextArea fx:id="mainTextArea" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.topAnchor="0"/>
+    </children>
+</AnchorPane>
