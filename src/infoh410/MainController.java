@@ -30,16 +30,15 @@ public class MainController implements Initializable{
     private void test() {
         TransferFunction tf = new Sigmoid();
         Layer[] layers = new Layer[]{
-                new FullyConnectedLayer(new int[] {0, 0}, new int[] {3, 3}, tf),
-                new FullyConnectedLayer(new int[] {3, 3}, new int[] {3, 3}, tf),
-                new FullyConnectedLayer(new int[] {3, 3}, new int[] {1, 1}, tf)
+                new FullyConnectedLayer(new int[]{0, 0}, new int[]{3, 3}, tf),
+                new FullyConnectedLayer(new int[]{3, 3}, new int[]{3, 3}, tf),
+                new FullyConnectedLayer(new int[]{3, 3}, new int[]{1, 1}, tf)
         };
 
         NeuralNetwork net = new NeuralNetwork(layers, 0.6);
 
 		/* Learning */
-        for(int i = 0; i < 3000; i++)
-        {
+        for (int i = 0; i < 2000; i++) {
             System.out.print("\n\nIteration " + i);
             double[][] inputs = new double[][]{
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
@@ -50,9 +49,9 @@ public class MainController implements Initializable{
             double error;
 
             System.out.println(Matrix.format(inputs));
-            if(inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1)
+            if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1)
                 output[0][0] = 1;
-            else if(inputs[2][0] == 1 && inputs[1][1] == 1 && inputs[0][2] == 1)
+            else if (inputs[2][0] == 1 && inputs[1][1] == 1 && inputs[0][2] == 1)
                 output[0][0] = 1;
             else
                 output[0][0] = 0;
@@ -66,16 +65,15 @@ public class MainController implements Initializable{
         mainTextArea.appendText("Learning completed!\n");
 
 		/* Test */
-
-        double[] inputs = new double[]{1.0, 0.0};
-        //double[] output = net.execute(inputs);
-
-        //mainTextArea.appendText(inputs[0] + " and " + inputs[1] + " = " + Math.round(output[0]) + " (" + output[0] + ")\n");
+        double[][] inputs = new double[][]{
+                {1, 0, 0},
+                {0, 0, 0},
+                {0, 0, 1}
+        };
+        double[][] output = net.execute(inputs);
+        mainTextArea.appendText("Test result: " + Math.round(output[0][0]) + " (" + output[0][0] + ")\n");
 
 
     }
-
-
-
 
 }
