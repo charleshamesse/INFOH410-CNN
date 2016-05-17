@@ -39,7 +39,7 @@ public class MainController implements Initializable{
 
 		/* Learning */
         for (int i = 0; i < 2000; i++) {
-            System.out.print("\n\nIteration " + i);
+            mainTextArea.appendText("\n\nIteration " + i);
             double[][] inputs = new double[][]{
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
@@ -48,7 +48,7 @@ public class MainController implements Initializable{
             double[][] output = new double[1][1];
             double error;
 
-            System.out.println(Matrix.format(inputs));
+            mainTextArea.appendText(Matrix.format(inputs));
             if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1)
                 output[0][0] = 1;
             else if (inputs[2][0] == 1 && inputs[1][1] == 1 && inputs[0][2] == 1)
@@ -56,10 +56,8 @@ public class MainController implements Initializable{
             else
                 output[0][0] = 0;
 
-            mainTextArea.appendText(inputs[0] + " and " + inputs[1] + " = " + output[0] + "\n");
-
             error = net.backPropagate(inputs, output);
-            mainTextArea.appendText("Error at step " + i + " is " + error + "\n");
+            mainTextArea.appendText("\nError at step " + i + " is " + error + "\n");
         }
 
         mainTextArea.appendText("Learning completed!\n");
