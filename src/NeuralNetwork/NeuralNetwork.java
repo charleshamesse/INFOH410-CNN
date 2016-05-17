@@ -3,6 +3,7 @@ package NeuralNetwork;
 
 import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.TransferFunctions.TransferFunction;
+import NeuralNetwork.Utils.Matrix;
 
 import java.io.*;
 
@@ -36,42 +37,47 @@ public class NeuralNetwork implements Serializable {
      * @param input 
      * @return 
      */
-    public double[] execute(double[] input)
+    public double[][] execute(double[][] input)
     {
         int i;
         int j;
         int k;
         double new_value;
 
-        double output[] = new double[layers[layers.length - 1].getHeight()];
+        double output[][] = new double[layers[layers.length - 1].getHeight()][layers[layers.length - 1].getWidth()];
 
         // Put input
         for(i = 0; i < layers[0].getHeight(); i++)
-        {
-            layers[0].getNeuron(i).value = input[i];
-        }
+            for(j = 0; j < layers[0].getWidth(); j++)
+                layers[0].getNeuron(i, j).value = input[i][j];
 
         // Execute - hiddens + output
         for(k = 1; k < layers.length; k++)
         {
             for(i = 0; i < layers[k].getHeight(); i++)
             {
-                new_value = 0.0;
-                for(j = 0; j < layers[k - 1].getHeight(); j++)
-                    new_value += layers[k].getNeuron(i).weights[j] * layers[k - 1].getNeuron(j).value;
+                for(j = 0; j < layers[k].getWidth(); j++)
+                {
+                    new_value = 0.0;
+                    for(int l = 0; l < layers[k - 1].getHeight(); l++)
+                        for(int m = 0; m < layers[k - 1].getWidth(); m++)
+                            new_value += layers[k].getNeuron(i, j).weights[l][m] * layers[k - 1].getNeuron(l, m).value;
 
-                new_value += layers[k].getNeuron(i).bias;
+                    new_value += layers[k].getNeuron(i, j).bias;
 
-                layers[k].getNeuron(i).value = layers[k].getTransferFunction().evaluate(new_value);
+                    layers[k].getNeuron(i, j).value = layers[k].getTransferFunction().evaluate(new_value);
+                    // System.out.println("Value ("+k+", "+i+", "+j+"): " + layers[k].getNeuron(i, j).value);
+
+                }
             }
         }
 
 
         // Get output
         for(i = 0; i < layers[layers.length - 1].getHeight(); i++)
-        {
-            output[i] = layers[layers.length - 1].getNeuron(i).value;
-        }
+            for(j = 0; j < layers[layers.length - 1].getWidth(); j++) {
+                output[i][j] = layers[layers.length - 1].getNeuron(i, j).value;
+            }
 
         return output;
     }
@@ -86,38 +92,47 @@ public class NeuralNetwork implements Serializable {
      * @param output
      * @return
      */
-    public double backPropagate(double[] input, double[] output)
+
+    public double backPropagate(double[][] input, double[][] output)
     {
-        double new_output[] = execute(input);
+        double new_output[][] = execute(input);
         double error;
-        int i, j, k;
+        int i, j, k, l, m;
 
-        for(i = 0; i < layers[layers.length - 1].getHeight(); i++)
-        {
-            error = output[i] - new_output[i];
-            layers[layers.length - 1].getNeuron(i).delta = error * layers[layers.length - 1].getTransferFunction().evaluateDerivate(new_output[i]);
+        for(i = 0; i < layers[layers.length - 1].getHeight(); i++) {
+            for (j = 0; j < layers[layers.length - 1].getWidth(); j++) {
+                error = output[i][j] - new_output[i][j];
+                layers[layers.length - 1].getNeuron(i,j).delta = error * layers[layers.length - 1].getTransferFunction().evaluateDerivate(new_output[i][j]);
+            }
         }
-
 
         for(k = layers.length - 2; k >= 0; k--)
         {
             // Compute layer error and delta
             for(i = 0; i < layers[k].getHeight(); i++)
             {
-                error = 0.0;
-                for(j = 0; j < layers[k + 1].getHeight(); j++)
-                    error += layers[k + 1].getNeuron(j).delta * layers[k + 1].getNeuron(j).weights[i];
+                for(j = 0; j < layers[k].getWidth(); j++)
+                {
+                    error = 0.0;
+                    for(l = 0; l < layers[k + 1].getHeight(); l++)
+                        for(m = 0; m < layers[k + 1].getWidth(); m++)
+                            error += layers[k + 1].getNeuron(l, m).delta * layers[k + 1].getNeuron(l, m).weights[i][j];
 
-                layers[k].getNeuron(i).delta = error * layers[k].getTransferFunction().evaluateDerivate(layers[k].getNeuron(i).value);
+                    layers[k].getNeuron(i, j).delta = error * layers[k].getTransferFunction().evaluateDerivate(layers[k].getNeuron(i, j).value);
+                }
             }
 
             // Propagate
             for(i = 0; i < layers[k + 1].getHeight(); i++)
             {
-                for(j = 0; j < layers[k].getHeight(); j++)
-                    layers[k + 1].getNeuron(i).weights[j] += learningRate * layers[k + 1].getNeuron(i).delta *
-                            layers[k].getNeuron(j).value;
-                layers[k + 1].getNeuron(i).bias += learningRate * layers[k + 1].getNeuron(i).delta;
+                for(j = 0; j < layers[k + 1].getWidth(); j++)
+                {
+                    for(l = 0; l < layers[k].getHeight(); l++)
+                        for(m = 0; m < layers[k].getWidth(); m++)
+                            layers[k + 1].getNeuron(i, j).weights[l][m] += learningRate * layers[k + 1].getNeuron(i, j).delta *
+                            layers[k].getNeuron(l, m).value;
+                    layers[k + 1].getNeuron(i, j).bias += learningRate * layers[k + 1].getNeuron(i, j).delta;
+                }
             }
         }
 
@@ -126,9 +141,10 @@ public class NeuralNetwork implements Serializable {
 
         for(i = 0; i < output.length; i++)
         {
-            error += Math.abs(new_output[i] - output[i]);
-
-            //System.out.println(output[i]+" "+new_output[i]);
+            for(j = 0; j < output[i].length; j++)
+            {
+                error += Math.abs(new_output[i][j] - output[i][j]);
+            }
         }
 
         error = error / output.length;

@@ -8,10 +8,10 @@ import NeuralNetwork.TransferFunctions.TransferFunction;
  */
 public class FullyConnectedLayer implements Layer {
 
-    private int ni, no;
+    private int nix, niy, nox, noy;
     private double[] w, b;
     private TransferFunction tf;
-    private Neuron[] neurons;
+    private Neuron[][] neurons;
 
     /**
      * FullyConnectedLayer
@@ -19,27 +19,37 @@ public class FullyConnectedLayer implements Layer {
      * @param no Number of output neurons = number of neurons in this layer
      * @param tf Transfer function
      */
-    public FullyConnectedLayer(int ni, int no, TransferFunction tf) {
-        this.no = no;
-        this.neurons = new Neuron[no];
+    public FullyConnectedLayer(int[] ni, int[] no, TransferFunction tf) {
+        this.nix = ni[0];
+        this.niy = ni[1];
+        this.nox = no[0];
+        this.noy = no[1];
+
+        this.neurons = new Neuron[noy][nox];
         this.tf = tf;
 
-        for(int j = 0; j < no; j++)
-            neurons[j] = new Neuron(ni);
+        for(int i = 0; i < noy; i++)
+            for(int j = 0; j < nox; j++)
+                neurons[i][j] = new Neuron(new int[] {nix, niy});
 
     }
 
     public int getHeight() {
-        return this.no;
+        return this.noy;
+    }
+    public int getWidth() {
+        return this.nox;
     }
 
-    public Neuron[] getNeurons() {
+    public Neuron[][] getNeurons() {
         return this.neurons;
     }
 
-    public Neuron getNeuron(int i) {
-        return this.neurons[i];
+
+    public Neuron getNeuron(int i, int j) {
+        return this.neurons[i][j];
     }
+
     public TransferFunction getTransferFunction() {
         return this.tf;
     }

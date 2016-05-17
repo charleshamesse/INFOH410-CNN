@@ -8,7 +8,8 @@ import NeuralNetwork.TransferFunctions.TransferFunction;
  */
 public interface Layer {
     public int getHeight();
-    public Neuron[] getNeurons();
-    public Neuron getNeuron(int i);
+    public int getWidth();
+    public Neuron[][] getNeurons();
+    public Neuron getNeuron(int i, int j);
     public TransferFunction getTransferFunction();
 }
