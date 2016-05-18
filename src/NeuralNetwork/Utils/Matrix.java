@@ -7,7 +7,7 @@ public class Matrix {
     public Matrix() {
 
     }
-    public static String format(double[][] a) {
+    public static String format(Double[][] a) {
         int row, column;
         String aString = "";
         for (row = 0; row < a.length; row++) {

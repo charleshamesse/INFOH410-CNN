@@ -4,14 +4,20 @@ import NeuralNetwork.Layers.FullyConnectedLayer;
 import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.TransferFunctions.Sigmoid;
 import NeuralNetwork.TransferFunctions.TransferFunction;
-import NeuralNetwork.Utils.Matrix;
+import NeuralNetwork.Utils.GrayImage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -23,32 +29,49 @@ public class MainController implements Initializable {
     @FXML
     private LineChart<Double, Double> graph;
 
+    @FXML
+    private ScatterChart<Number, Number> matrixGraph;
+
+    @FXML
+    private ImageView inputImageView;
+
     ObservableList<XYChart.Series<Double, Double>> lineChartData;
     LineChart.Series<Double, Double> series1;
+
+    GrayImage inputImage;
 
 
     public MainController() {
     }
 
     public void initialize(URL url, ResourceBundle rb) {
-
+        // Plots
         lineChartData = FXCollections.observableArrayList();
         graph.setData(lineChartData);
+        graph.setTitle("Training instances");
         graph.createSymbolsProperty();
         series1 = new LineChart.Series<Double, Double>();
         series1.setName("Training set");
         lineChartData.add(series1);
 
+        // Images
+        inputImage  = new GrayImage("res/truc.png");
+    }
+    @FXML
+    private void train() {
+        mainTextArea.appendText("Starting learn process..\n");
+        run();
     }
 
 
     @FXML
-    private void start() {
-        mainTextArea.appendText("Starting learn process..\n");
-        test();
+    private void test() {
+        Image image = SwingFXUtils.toFXImage(inputImage.getBufferedImage(), null);
+        inputImageView.setImage(image);
+        mainTextArea.appendText("Not implemented yet..\n");
     }
 
-    private void test() {
+    private void run() {
         TransferFunction tf = new Sigmoid();
         Layer[] layers = new Layer[]{
                 new FullyConnectedLayer(new int[]{0, 0}, new int[]{3, 3}, tf),
@@ -75,8 +98,8 @@ public class MainController implements Initializable {
             //System.out.println(Matrix.format(inputs));
             if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1)
                 output[0][0] = 1;
-            else if (inputs[0][2] == 1 && inputs[1][1] == 1 && inputs[2][0] == 1)
-                output[0][0] = 1;
+            /*else if (inputs[0][2] == 1 && inputs[1][1] == 1 && inputs[2][0] == 1)
+                output[0][0] = 1;*/
             else
                 output[0][0] = 0;
 
