@@ -5,21 +5,42 @@ import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.TransferFunctions.Sigmoid;
 import NeuralNetwork.TransferFunctions.TransferFunction;
 import NeuralNetwork.Utils.Matrix;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.TextArea;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class MainController implements Initializable{
+public class MainController implements Initializable {
+
     @FXML
     private TextArea mainTextArea;
+
+    @FXML
+    private LineChart<Double, Double> graph;
+
+    ObservableList<XYChart.Series<Double, Double>> lineChartData;
+    LineChart.Series<Double, Double> series1;
+
 
     public MainController() {
     }
 
     public void initialize(URL url, ResourceBundle rb) {
+
+        lineChartData = FXCollections.observableArrayList();
+        graph.setData(lineChartData);
+        graph.createSymbolsProperty();
+        series1 = new LineChart.Series<Double, Double>();
+        series1.setName("Training set");
+        lineChartData.add(series1);
+
     }
+
 
     @FXML
     private void start() {
@@ -35,11 +56,14 @@ public class MainController implements Initializable{
                 new FullyConnectedLayer(new int[]{3, 3}, new int[]{1, 1}, tf)
         };
 
-        NeuralNetwork net = new NeuralNetwork(layers, 0.6);
+        NeuralNetwork net = new NeuralNetwork(layers, 0.5);
 
 		/* Learning */
-        for (int i = 0; i < 2000; i++) {
-            mainTextArea.appendText("\n\nIteration " + i);
+        for (int i = 0; i < 100000; i++) {
+            //mainTextArea.appendText("\nIteration " + i);
+            if(i % 5000 == 0) {
+                System.out.println("Iteration " + i);
+            }
             double[][] inputs = new double[][]{
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
@@ -48,16 +72,23 @@ public class MainController implements Initializable{
             double[][] output = new double[1][1];
             double error;
 
-            mainTextArea.appendText(Matrix.format(inputs));
+            //System.out.println(Matrix.format(inputs));
             if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1)
                 output[0][0] = 1;
-            else if (inputs[2][0] == 1 && inputs[1][1] == 1 && inputs[0][2] == 1)
+            else if (inputs[0][2] == 1 && inputs[1][1] == 1 && inputs[2][0] == 1)
                 output[0][0] = 1;
             else
                 output[0][0] = 0;
 
             error = net.backPropagate(inputs, output);
-            mainTextArea.appendText("\nError at step " + i + " is " + error + "\n");
+            //System.out.println("\nError at step " + i + " is " + error + "\n");
+            if(i % 100 == 0) {
+                series1.getData().add(new XYChart.Data<Double, Double>(Double.valueOf(i), error));
+                if(error > .95) {
+                    //System.out.println(Matrix.format(inputs));
+                    //System.out.println("Output: " + output[0][0]);
+                }
+            }
         }
 
         mainTextArea.appendText("Learning completed!\n");

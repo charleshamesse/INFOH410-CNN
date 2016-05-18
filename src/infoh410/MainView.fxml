@@ -1,11 +1,28 @@
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.AnchorPane?>
 
 <?import javafx.scene.control.Button?>
-<AnchorPane fx:controller="infoh410.MainController"
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+<GridPane fx:controller="infoh410.MainController"
             xmlns:fx="http://javafx.com/fxml">
     <children>
-        <Button text="Start" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" onAction="#start" />
-    <TextArea fx:id="mainTextArea" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.topAnchor="30"/>
+        <LineChart fx:id="graph" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <xAxis><NumberAxis label="Values for X-Axis" lowerBound="0" upperBound="3" tickUnit="1"/></xAxis>
+            <yAxis><NumberAxis label="Values for Y-Axis" lowerBound="0" upperBound="3" tickUnit="1"/></yAxis>
+        </LineChart>
+        <TextArea fx:id="mainTextArea" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <Button text="Start" GridPane.columnIndex="0" GridPane.rowIndex="0" onAction="#start" />
     </children>
-</AnchorPane>
+
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="30.0" minHeight="30.0"  vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="300.0" minHeight="100.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="400.0" minHeight="100.0"  vgrow="SOMETIMES" />
+    </rowConstraints>
+</GridPane>
