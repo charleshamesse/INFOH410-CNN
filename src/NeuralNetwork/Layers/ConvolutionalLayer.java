@@ -15,6 +15,7 @@ public class ConvolutionalLayer implements Layer {
     private Neuron[][] neurons;
     private double[][] kernel;
     private Layer previousLayer;
+    private int stride;
 
     /**
      * FullyConnectedLayer
@@ -34,7 +35,9 @@ public class ConvolutionalLayer implements Layer {
         for(int i = 0; i < noy; i++)
             for(int j = 0; j < nox; j++)
                 neurons[i][j] = new Neuron(new int[] {nix, niy});
-
+        // Stride
+        this.stride = 1;
+        // Kernel with F = 3
         this.kernel = new double[][]{
                 {0.0, 0.0, 0.0},
                 {0.0, 1.0, 0.0},
@@ -53,32 +56,60 @@ public class ConvolutionalLayer implements Layer {
         double new_value;
         // Pad input
         Double[][] input = applyPadding();
+
+        /*
+        System.out.println("Padding:");
+        System.out.println(Matrix.format(input));
+        System.out.println("This layer's dimensions: h:" + getHeight() + ", w:" + getWidth());
+        System.out.println("This input's dimensions: h:" + input.length + ", w:" + input[0].length);
+        */
         // Convolve kernel
-        for(i = 0; i < input.length - (kernel.length - 2); i += 2)
-        {
-            for(j = 0; j < input[0].length - (kernel[0].length - 2); j += 2)
-            {
+        for(i = 0; i < getHeight(); ++i) {
+            for(j = 0; j < getWidth(); ++j) {
+
+                // For each this layer's cells
                 new_value = 0.0;
+                // Weight does not apply if we're on the border
                 for(l = 0; l < kernel.length; ++l) {
                     for(m = 0; m < kernel[0].length; ++m) {
-                        new_value += input[i+l][j+m] * neurons[l][m].weights[l][m] * kernel[l][m];
+                        if(stride*i+l < getHeight() && stride*j+m < getWidth())
+                            new_value += neurons[i][j].weights[stride*i+l][stride*j+m] * input[stride*i+l][stride*j+m] * kernel[l][m];
                     }
                 }
                 /*
-                new_value = 0.0;
-                for(int l = 0; l < input.length - (kernel.length-1); l++)
-                    for(int m = 0; m < input[0].length - (kernel[0].length-1); m++)
-                        new_value += neurons[i][j].weights[l][m] * previousLayer.getNeuron(l, m).value;
+                new_value += neurons[i][j].weights[stride*i][stride*j] * input[stride*i][stride*j] * kernel[0][0];
+                new_value += neurons[i][j].weights[stride*i][stride*j+1] * input[stride*i][stride*j+1]*kernel[0][1];
+                new_value += neurons[i][j].weights[stride*i][stride*j+2] * input[stride*i][stride*j+2]*kernel[0][2];
+                new_value += neurons[i][j].weights[stride*i+1][stride*j] * input[stride*i+1][stride*j]*kernel[1][0];
+                new_value += neurons[i][j].weights[stride*i+1][stride*j+1] * input[stride*i+1][stride*j+1]*kernel[1][1];
+                new_value += neurons[i][j].weights[stride*i+1][stride*j+2] * input[stride*i+1][stride*j+2]*kernel[1][2];
+                new_value += neurons[i][j].weights[stride*i+2][stride*j] * input[stride*i+2][stride*j]*kernel[2][0];
+                new_value += neurons[i][j].weights[stride*i+2][stride*j+1] * input[stride*i+2][stride*j+1]*kernel[2][1];
+                new_value += neurons[i][j].weights[stride*i+2][stride*j+2] * input[stride*i+2][stride*j+2]*kernel[2][2];
+                /*
+                for(l = 0; l < kernel.length; l++)
+                    for(m = 0; m < kernel[0].length; m++)
+                        //if(i != 0 && j != 0 && i != input.length-1 && j != input[0].length-1) // No weight defined on borders
+                            if(stride*i+l < neurons[i][j].weights.length && stride*j+m < neurons[i][j].weights[0].length)
+                                new_value += neurons[i][j].weights[stride*i+l][stride*j+m] * input[stride*i+l][stride*j+m];
+
+
+        System.out.println("First");
+        System.out.println(Matrix.format(previousLayer.getNeurons()));
+        System.out.println("Second");
+        System.out.println(Matrix.format(neurons));
+                */
 
                 new_value += this.getNeuron(i, j).bias;
-                */
-                neurons[i/2][j/2].value = tf.evaluate(new_value);
+                neurons[i][j].value = tf.evaluate(new_value);
             }
         }
+
+
     }
     private Double[][] applyPadding() {
-        int h = previousLayer.getHeight() + 1;
-        int w = previousLayer.getWidth() + 1;
+        int h = previousLayer.getHeight() + 2;
+        int w = previousLayer.getWidth() + 2;
         int i, j;
         Double[][] new_input = new Double[h][w];
         for(i = 0; i < h; ++i) {

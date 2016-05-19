@@ -6,6 +6,7 @@ import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.TransferFunctions.Sigmoid;
 import NeuralNetwork.TransferFunctions.TransferFunction;
 import NeuralNetwork.Utils.GrayImage;
+import NeuralNetwork.Utils.Matrix;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -17,8 +18,6 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -75,8 +74,7 @@ public class MainController implements Initializable {
     private void run() {
         TransferFunction tf = new Sigmoid();
         Layer[] layers = new Layer[]{
-                new FullyConnectedLayer(new int[]{0, 0}, new int[]{6, 6}, tf),
-                new ConvolutionalLayer(new int[]{6, 6}, new int[]{3, 3}, tf),
+                new FullyConnectedLayer(new int[]{0, 0}, new int[]{3, 3}, tf),
                 new FullyConnectedLayer(new int[]{3, 3}, new int[]{3, 3}, tf),
                 new FullyConnectedLayer(new int[]{3, 3}, new int[]{1, 1}, tf)
         };
@@ -84,12 +82,12 @@ public class MainController implements Initializable {
         NeuralNetwork net = new NeuralNetwork(layers, 0.5);
 
 		/* Learning */
-        for (int i = 0; i < 120000; i++) {
+        for (int i = 0; i < 100000; i++) {
             //mainTextArea.appendText("\nIteration " + i);
             if(i % 5000 == 0) {
                 System.out.println("Iteration " + i);
             }
-            double[][] inputs = new double[][]{
+            double[][] _inputs = new double[][]{
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
@@ -97,14 +95,21 @@ public class MainController implements Initializable {
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())}
             };
+            double[][] inputs = new double[][]{
+                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
+                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
+                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())}
+            };
             double[][] output = new double[1][1];
             double error;
 
             //System.out.println(Matrix.format(inputs));
-            if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1 && inputs[3][3] == 1 && inputs[4][4] == 1 && inputs[5][5] == 1)
+            if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1) e// && inputs[3][3] == 1 && inputs[4][4] == 1 && inputs[5][5] == 1)
                 output[0][0] = 1;
+            /*
             else if (inputs[0][5] == 1 && inputs[1][4] == 1 && inputs[2][3] == 1 && inputs[3][2] == 1 && inputs[4][1] == 1 && inputs[5][0] == 1)
                 output[0][0] = 1;
+                */
             else
                 output[0][0] = 0;
 
@@ -112,9 +117,9 @@ public class MainController implements Initializable {
             //System.out.println("\nError at step " + i + " is " + error + "\n");
             if(i % 100 == 0) {
                 series1.getData().add(new XYChart.Data<Double, Double>(Double.valueOf(i), error));
-                if(error > .95) {
-                    //System.out.println(Matrix.format(inputs));
-                    //System.out.println("Output: " + output[0][0]);
+                if(error > .9) {
+                    System.out.println(Matrix.format(inputs));
+                    System.out.println("Output ("+i+"): " + output[0][0] + ", error: " + error);
                 }
             }
         }

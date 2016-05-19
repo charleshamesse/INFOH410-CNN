@@ -81,10 +81,11 @@ public class NeuralNetwork implements Serializable {
 
     public double backPropagate(double[][] input, double[][] output)
     {
-        double new_output[][] = execute(input);
+        double new_output[][] = execute(input); // 1X1
         double error;
         int i, j, k, l, m;
 
+        // Adjust last layer
         for(i = 0; i < layers[layers.length - 1].getHeight(); i++) {
             for (j = 0; j < layers[layers.length - 1].getWidth(); j++) {
                 error = output[i][j] - new_output[i][j];
@@ -92,9 +93,10 @@ public class NeuralNetwork implements Serializable {
             }
         }
 
+        // Adjust all other layers
         for(k = layers.length - 2; k >= 0; k--)
         {
-            // Compute layer error and delta
+            // Compute delta
             for(i = 0; i < layers[k].getHeight(); i++)
             {
                 for(j = 0; j < layers[k].getWidth(); j++)
@@ -108,15 +110,15 @@ public class NeuralNetwork implements Serializable {
                 }
             }
 
-            // Propagate
+            // Propagate and adjust weight
             for(i = 0; i < layers[k + 1].getHeight(); i++)
             {
                 for(j = 0; j < layers[k + 1].getWidth(); j++)
                 {
                     for(l = 0; l < layers[k].getHeight(); l++)
                         for(m = 0; m < layers[k].getWidth(); m++)
-                            layers[k + 1].getNeuron(i, j).weights[l][m] += learningRate * layers[k + 1].getNeuron(i, j).delta *
-                            layers[k].getNeuron(l, m).value;
+                            layers[k + 1].getNeuron(i, j).weights[l][m] += learningRate * layers[k + 1].getNeuron(i, j).delta * layers[k].getNeuron(l, m).value;
+
                     layers[k + 1].getNeuron(i, j).bias += learningRate * layers[k + 1].getNeuron(i, j).delta;
                 }
             }

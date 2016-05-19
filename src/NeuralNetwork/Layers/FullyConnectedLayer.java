@@ -70,6 +70,8 @@ public class FullyConnectedLayer implements Layer {
         return this.neurons;
     }
 
+
+
     public Neuron getNeuron(int i, int j) {
         return this.neurons[i][j];
     }
