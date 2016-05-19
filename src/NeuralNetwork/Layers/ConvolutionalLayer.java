@@ -7,7 +7,7 @@ import NeuralNetwork.Utils.Matrix;
 /**
  * Created by charleshamesse on 16/05/16.
  */
-public class ConvolutionalLayer implements Layer {
+public class ConvolutionalLayer extends Layer {
 
     private int nix, niy, nox, noy;
     private double[] w, b;
@@ -24,17 +24,7 @@ public class ConvolutionalLayer implements Layer {
      * @param tf Transfer function
      */
     public ConvolutionalLayer(int[] ni, int[] no, TransferFunction tf) {
-        this.nix = ni[0];
-        this.niy = ni[1];
-        this.nox = no[0];
-        this.noy = no[1];
-        this.tf = tf;
-
-        this.neurons = new Neuron[noy][nox];
-
-        for(int i = 0; i < noy; i++)
-            for(int j = 0; j < nox; j++)
-                neurons[i][j] = new Neuron(new int[] {nix, niy});
+        super(ni, no, tf);
         // Stride
         this.stride = 1;
         // Kernel with F = 3

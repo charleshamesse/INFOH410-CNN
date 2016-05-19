@@ -74,20 +74,20 @@ public class MainController implements Initializable {
     private void run() {
         TransferFunction tf = new Sigmoid();
         Layer[] layers = new Layer[]{
-                new FullyConnectedLayer(new int[]{0, 0}, new int[]{3, 3}, tf),
-                new FullyConnectedLayer(new int[]{3, 3}, new int[]{3, 3}, tf),
-                new FullyConnectedLayer(new int[]{3, 3}, new int[]{1, 1}, tf)
+                new FullyConnectedLayer(new int[]{0, 0}, new int[]{6, 6}, tf),
+                new FullyConnectedLayer(new int[]{6, 6}, new int[]{6, 6}, tf),
+                new FullyConnectedLayer(new int[]{6, 6}, new int[]{1, 1}, tf)
         };
 
         NeuralNetwork net = new NeuralNetwork(layers, 0.5);
 
 		/* Learning */
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 200000; i++) {
             //mainTextArea.appendText("\nIteration " + i);
             if(i % 5000 == 0) {
                 System.out.println("Iteration " + i);
             }
-            double[][] _inputs = new double[][]{
+            double[][] inputs = new double[][]{
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
@@ -95,7 +95,7 @@ public class MainController implements Initializable {
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())}
             };
-            double[][] inputs = new double[][]{
+            double[][] _inputs = new double[][]{
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
                     {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())}
@@ -104,7 +104,7 @@ public class MainController implements Initializable {
             double error;
 
             //System.out.println(Matrix.format(inputs));
-            if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1) e// && inputs[3][3] == 1 && inputs[4][4] == 1 && inputs[5][5] == 1)
+            if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1 && inputs[3][3] == 1 && inputs[4][4] == 1 && inputs[5][5] == 1)
                 output[0][0] = 1;
             /*
             else if (inputs[0][5] == 1 && inputs[1][4] == 1 && inputs[2][3] == 1 && inputs[3][2] == 1 && inputs[4][1] == 1 && inputs[5][0] == 1)
@@ -115,7 +115,7 @@ public class MainController implements Initializable {
 
             error = net.backPropagate(inputs, output);
             //System.out.println("\nError at step " + i + " is " + error + "\n");
-            if(i % 100 == 0) {
+            if(i % 200 == 0) {
                 series1.getData().add(new XYChart.Data<Double, Double>(Double.valueOf(i), error));
                 if(error > .9) {
                     System.out.println(Matrix.format(inputs));
