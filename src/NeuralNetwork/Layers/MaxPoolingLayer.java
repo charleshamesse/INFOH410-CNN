@@ -32,8 +32,10 @@ public class MaxPoolingLayer extends Layer{
             {
                 new_value = 0.0;
                 for(l = 0; l < h_pool; l++)
-                    for(m = 0; m < w_pool; m++)
-                        if(previousLayer.getNeuron(h_pool*i+l, w_pool*j+m).value > new_value) new_value = previousLayer.getNeuron(h_pool*i+l, w_pool*j+m).value;
+                    for(m = 0; m < w_pool; m++) {
+                        if (previousLayer.getNeuron(h_pool * i + l, w_pool * j + m).value > new_value)
+                            new_value = previousLayer.getNeuron(h_pool * i + l, w_pool * j + m).value;
+                    }
 
                 new_value += this.getNeuron(i, j).bias;
 

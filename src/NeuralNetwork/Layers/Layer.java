@@ -36,6 +36,15 @@ public class Layer {
 
     }
 
+    public double[][] getNeuronValues() {
+        double[][] arr = new double[getHeight()][getWidth()];
+        for(int i = 0; i < noy; ++i) {
+            for(int j = 0; j < nox; ++j) {
+                arr[i][j] = neurons[i][j].value;
+            }
+        }
+        return arr;
+    }
     public int getHeight() {
         return this.noy;
     }

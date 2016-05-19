@@ -26,6 +26,14 @@ public class GrayImage {
         }
         getArray();
     }
+    public GrayImage(double[][] arr) {
+        this.values = new int[arr.length][arr[0].length];
+        for(int i = 0; i < arr.length; ++i) {
+            for(int j = 0; j < arr[0].length; ++j) {
+                this.values[i][j] = (int) Math.round(255*arr[i][j]);
+            }
+        }
+    }
 
 
     public int[][] getArray() {
@@ -76,6 +84,25 @@ public class GrayImage {
                         if(values[h_pool*i+l][w_pool*j+m] > new_value) new_value = values[h_pool*i+l][w_pool*j+m];
 
                 new_arr[i][j] = new_value;
+            }
+        }
+        this.values = new_arr;
+        return new_arr;
+    }
+
+    public int[][] superSample(int w, int h) {
+        int x_length = this.values.length;
+        int y_length = this.values[0].length;
+        int h_pool = h / y_length;
+        int w_pool = w / x_length;
+        int i, j, l, m;
+        int new_value;
+        int[][] new_arr = new int[h][w];
+        for(i = 0; i < h; i++) {
+            for(j = 0; j < w; j++) {
+                l = (int) Math.floor(i / h_pool);
+                m = (int) Math.floor(j / w_pool);
+                new_arr[i][j] = values[l][m];
             }
         }
         this.values = new_arr;

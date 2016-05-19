@@ -1,9 +1,6 @@
 package infoh410;
 import NeuralNetwork.*;
-import NeuralNetwork.Layers.ConvolutionalLayer;
-import NeuralNetwork.Layers.FullyConnectedLayer;
-import NeuralNetwork.Layers.Layer;
-import NeuralNetwork.Layers.MaxPoolingLayer;
+import NeuralNetwork.Layers.*;
 import NeuralNetwork.TransferFunctions.Sigmoid;
 import NeuralNetwork.TransferFunctions.TransferFunction;
 import NeuralNetwork.Utils.GrayImage;
@@ -70,27 +67,25 @@ public class MainController implements Initializable {
         Image image = SwingFXUtils.toFXImage(inputImage.getBufferedImage(), null);
         inputImageView.setImage(image);
         mainTextArea.appendText("Not implemented yet..\n");
-        TransferFunction tf = new Sigmoid();
-        MaxPoolingLayer MPLayer = new MaxPoolingLayer(new int[]{8, 8}, new int[]{4, 4}, tf);
     }
 
     private void run() {
         TransferFunction tf = new Sigmoid();
+        Layer topLayer = new FullyConnectedLayer(new int[]{0, 0}, new int[]{20, 20}, tf);
+        Layer midLayer = new MaxPoolingLayer(new int[]{20, 20}, new int[]{10, 10}, tf);
+        Layer bottomLayer = new FullyConnectedLayer(new int[]{10, 10}, new int[]{1, 1}, tf);
         Layer[] layers = new Layer[]{
-                new FullyConnectedLayer(new int[]{0, 0}, new int[]{6, 6}, tf),
-                new FullyConnectedLayer(new int[]{6, 6}, new int[]{6, 6}, tf),
-                new MaxPoolingLayer(new int[]{6, 6}, new int[]{3, 3}, tf),
-                new FullyConnectedLayer(new int[]{3, 3}, new int[]{1, 1}, tf)
+                topLayer,
+                midLayer,
+                bottomLayer
         };
 
         NeuralNetwork net = new NeuralNetwork(layers, 0.01);
 
 		/* Learning */
-        for (int i = 0; i < 300000; i++) {
-            double[][] inputs = new double[6][6];
+        for (int i = 0; i < 2000; i++) {
+            double[][] inputs = new double[20][20];
             Matrix.initMat(inputs);
-            double[][] _inputs = new double[3][3];
-            Matrix.initMat(_inputs);
             double[][] output = new double[1][1];
             double error;
 
@@ -100,6 +95,10 @@ public class MainController implements Initializable {
             //System.out.println("\nError at step " + i + " is " + error + "\n");
             if(i % 200 == 0) {
                 series1.getData().add(new XYChart.Data<>((double)i, error));
+                GrayImage layerImage = new GrayImage(bottomLayer.getNeuronValues());
+                layerImage.superSample(200, 200);
+                Image image = SwingFXUtils.toFXImage(layerImage.getBufferedImage(), null);
+                inputImageView.setImage(image);
                 if(error > .9) {
                     //System.out.println(Matrix.format(inputs));
                     //System.out.println("Output ("+i+"): " + output[0][0] + ", error: " + error);
