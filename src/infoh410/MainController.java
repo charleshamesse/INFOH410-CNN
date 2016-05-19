@@ -7,6 +7,7 @@ import NeuralNetwork.Layers.MaxPoolingLayer;
 import NeuralNetwork.TransferFunctions.Sigmoid;
 import NeuralNetwork.TransferFunctions.TransferFunction;
 import NeuralNetwork.Utils.GrayImage;
+import NeuralNetwork.Utils.Matrix;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -65,6 +66,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void test() {
+        inputImage.subSample(50, 50);
         Image image = SwingFXUtils.toFXImage(inputImage.getBufferedImage(), null);
         inputImageView.setImage(image);
         mainTextArea.appendText("Not implemented yet..\n");

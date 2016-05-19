@@ -68,12 +68,12 @@ public class GrayImage {
         int i, j, l, m;
         int new_value;
         int[][] new_arr = new int[h][w];
-        for(i = 0; i < y_length; i++) {
-            for(j = 0; j < x_length; j++) {
+        for(i = 0; i < h; i++) {
+            for(j = 0; j < w; j++) {
                 new_value = 0;
                 for(l = 0; l < h_pool; l++)
                     for(m = 0; m < w_pool; m++)
-                        new_value += values[h_pool*i+l][w_pool*j+m];
+                        if(values[h_pool*i+l][w_pool*j+m] > new_value) new_value = values[h_pool*i+l][w_pool*j+m];
 
                 new_arr[i][j] = new_value;
             }
