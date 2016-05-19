@@ -3,6 +3,7 @@ import NeuralNetwork.*;
 import NeuralNetwork.Layers.ConvolutionalLayer;
 import NeuralNetwork.Layers.FullyConnectedLayer;
 import NeuralNetwork.Layers.Layer;
+import NeuralNetwork.Layers.MaxPoolingLayer;
 import NeuralNetwork.TransferFunctions.Sigmoid;
 import NeuralNetwork.TransferFunctions.TransferFunction;
 import NeuralNetwork.Utils.GrayImage;
@@ -69,6 +70,8 @@ public class MainController implements Initializable {
         Image image = SwingFXUtils.toFXImage(inputImage.getBufferedImage(), null);
         inputImageView.setImage(image);
         mainTextArea.appendText("Not implemented yet..\n");
+        TransferFunction tf = new Sigmoid();
+        MaxPoolingLayer MPLayer = new MaxPoolingLayer(new int[]{8, 8}, new int[]{4, 4}, tf);
     }
 
     private void run() {
@@ -76,10 +79,11 @@ public class MainController implements Initializable {
         Layer[] layers = new Layer[]{
                 new FullyConnectedLayer(new int[]{0, 0}, new int[]{6, 6}, tf),
                 new FullyConnectedLayer(new int[]{6, 6}, new int[]{6, 6}, tf),
-                new FullyConnectedLayer(new int[]{6, 6}, new int[]{1, 1}, tf)
+                new MaxPoolingLayer(new int[]{6, 6}, new int[]{3, 3}, tf),
+                new FullyConnectedLayer(new int[]{3, 3}, new int[]{1, 1}, tf)
         };
 
-        NeuralNetwork net = new NeuralNetwork(layers, 0.5);
+        NeuralNetwork net = new NeuralNetwork(layers, 0.01);
 
 		/* Learning */
         for (int i = 0; i < 300000; i++) {
@@ -90,23 +94,15 @@ public class MainController implements Initializable {
             double[][] output = new double[1][1];
             double error;
 
-            //System.out.println(Matrix.format(inputs));
-            if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1 && inputs[3][3] == 1 && inputs[4][4] == 1 && inputs[5][5] == 1)
-                output[0][0] = 1;
-            /*
-            else if (inputs[0][5] == 1 && inputs[1][4] == 1 && inputs[2][3] == 1 && inputs[3][2] == 1 && inputs[4][1] == 1 && inputs[5][0] == 1)
-                output[0][0] = 1;
-                */
-            else
-                output[0][0] = 0;
+            output[0][0] = generateOutput(inputs);
 
             error = net.backPropagate(inputs, output);
             //System.out.println("\nError at step " + i + " is " + error + "\n");
             if(i % 200 == 0) {
                 series1.getData().add(new XYChart.Data<>((double)i, error));
                 if(error > .9) {
-                    System.out.println(Matrix.format(inputs));
-                    System.out.println("Output ("+i+"): " + output[0][0] + ", error: " + error);
+                    //System.out.println(Matrix.format(inputs));
+                    //System.out.println("Output ("+i+"): " + output[0][0] + ", error: " + error);
                 }
             }
         }
@@ -126,4 +122,16 @@ public class MainController implements Initializable {
         */
     }
 
+    private double generateOutput(double[][] input) {
+        int count = 0;
+        int current = 0;
+        for(int i = 0; i < input.length / 2; ++i) {
+            for(int j = 0; j < input.length; ++j) {
+                ++count;
+                if(input[i][j] == 1)
+                    ++current;
+            }
+        }
+        return (current / count > 0.9) ? 1.0 : 0.0;
+    }
 }
