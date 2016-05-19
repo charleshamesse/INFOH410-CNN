@@ -7,7 +7,6 @@ import NeuralNetwork.Layers.MaxPoolingLayer;
 import NeuralNetwork.TransferFunctions.Sigmoid;
 import NeuralNetwork.TransferFunctions.TransferFunction;
 import NeuralNetwork.Utils.GrayImage;
-import NeuralNetwork.Utils.Matrix;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -38,7 +37,6 @@ public class MainController implements Initializable {
 
     ObservableList<XYChart.Series<Double, Double>> lineChartData;
     LineChart.Series<Double, Double> series1;
-
     GrayImage inputImage;
 
 

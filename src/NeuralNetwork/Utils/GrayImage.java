@@ -60,4 +60,26 @@ public class GrayImage {
 
     }
 
+    public int[][] subSample(int w, int h) {
+        int x_length = this.values.length;
+        int y_length = this.values[0].length;
+        int h_pool = y_length / h;
+        int w_pool = x_length / w;
+        int i, j, l, m;
+        int new_value;
+        int[][] new_arr = new int[h][w];
+        for(i = 0; i < y_length; i++) {
+            for(j = 0; j < x_length; j++) {
+                new_value = 0;
+                for(l = 0; l < h_pool; l++)
+                    for(m = 0; m < w_pool; m++)
+                        new_value += values[h_pool*i+l][w_pool*j+m];
+
+                new_arr[i][j] = new_value;
+            }
+        }
+        this.values = new_arr;
+        return new_arr;
+    }
+
 }
