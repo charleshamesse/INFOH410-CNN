@@ -1,5 +1,6 @@
 package infoh410;
 import NeuralNetwork.*;
+import NeuralNetwork.Layers.ConvolutionalLayer;
 import NeuralNetwork.Layers.FullyConnectedLayer;
 import NeuralNetwork.Layers.Layer;
 import NeuralNetwork.TransferFunctions.Sigmoid;
@@ -55,7 +56,7 @@ public class MainController implements Initializable {
         lineChartData.add(series1);
 
         // Images
-        inputImage  = new GrayImage("res/truc.png");
+        inputImage  = new GrayImage("res/plane.jpeg");
     }
     @FXML
     private void train() {
@@ -74,7 +75,8 @@ public class MainController implements Initializable {
     private void run() {
         TransferFunction tf = new Sigmoid();
         Layer[] layers = new Layer[]{
-                new FullyConnectedLayer(new int[]{0, 0}, new int[]{3, 3}, tf),
+                new FullyConnectedLayer(new int[]{0, 0}, new int[]{6, 6}, tf),
+                new ConvolutionalLayer(new int[]{6, 6}, new int[]{3, 3}, tf),
                 new FullyConnectedLayer(new int[]{3, 3}, new int[]{3, 3}, tf),
                 new FullyConnectedLayer(new int[]{3, 3}, new int[]{1, 1}, tf)
         };
@@ -82,24 +84,27 @@ public class MainController implements Initializable {
         NeuralNetwork net = new NeuralNetwork(layers, 0.5);
 
 		/* Learning */
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 120000; i++) {
             //mainTextArea.appendText("\nIteration " + i);
             if(i % 5000 == 0) {
                 System.out.println("Iteration " + i);
             }
             double[][] inputs = new double[][]{
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())}
+                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
+                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
+                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
+                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
+                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
+                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())}
             };
             double[][] output = new double[1][1];
             double error;
 
             //System.out.println(Matrix.format(inputs));
-            if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1)
+            if (inputs[0][0] == 1 && inputs[1][1] == 1 && inputs[2][2] == 1 && inputs[3][3] == 1 && inputs[4][4] == 1 && inputs[5][5] == 1)
                 output[0][0] = 1;
-            /*else if (inputs[0][2] == 1 && inputs[1][1] == 1 && inputs[2][0] == 1)
-                output[0][0] = 1;*/
+            else if (inputs[0][5] == 1 && inputs[1][4] == 1 && inputs[2][3] == 1 && inputs[3][2] == 1 && inputs[4][1] == 1 && inputs[5][0] == 1)
+                output[0][0] = 1;
             else
                 output[0][0] = 0;
 
@@ -117,6 +122,7 @@ public class MainController implements Initializable {
         mainTextArea.appendText("Learning completed!\n");
 
 		/* Test */
+        /*
         double[][] inputs = new double[][]{
                 {1, 0, 0},
                 {0, 0, 0},
@@ -125,7 +131,7 @@ public class MainController implements Initializable {
         double[][] output = net.execute(inputs);
         mainTextArea.appendText("Test result: " + Math.round(output[0][0]) + " (" + output[0][0] + ")\n");
 
-
+        */
     }
 
 }

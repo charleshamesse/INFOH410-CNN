@@ -54,22 +54,8 @@ public class NeuralNetwork implements Serializable {
         // Execute - hiddens + output
         for(k = 1; k < layers.length; k++)
         {
-            for(i = 0; i < layers[k].getHeight(); i++)
-            {
-                for(j = 0; j < layers[k].getWidth(); j++)
-                {
-                    new_value = 0.0;
-                    for(int l = 0; l < layers[k - 1].getHeight(); l++)
-                        for(int m = 0; m < layers[k - 1].getWidth(); m++)
-                            new_value += layers[k].getNeuron(i, j).weights[l][m] * layers[k - 1].getNeuron(l, m).value;
-
-                    new_value += layers[k].getNeuron(i, j).bias;
-
-                    layers[k].getNeuron(i, j).value = layers[k].getTransferFunction().evaluate(new_value);
-                    // System.out.println("Value ("+k+", "+i+", "+j+"): " + layers[k].getNeuron(i, j).value);
-
-                }
-            }
+            layers[k].connectPreviousLayer(layers[k-1]);
+            layers[k].execute();
         }
 
 

@@ -2,6 +2,7 @@ package NeuralNetwork.Layers;
 
 import NeuralNetwork.Neuron;
 import NeuralNetwork.TransferFunctions.TransferFunction;
+import NeuralNetwork.Utils.Matrix;
 
 /**
  * Created by charleshamesse on 16/05/16.
@@ -12,6 +13,7 @@ public class FullyConnectedLayer implements Layer {
     private double[] w, b;
     private TransferFunction tf;
     private Neuron[][] neurons;
+    private Layer previousLayer;
 
     /**
      * FullyConnectedLayer
@@ -34,6 +36,29 @@ public class FullyConnectedLayer implements Layer {
 
     }
 
+    public void connectPreviousLayer(Layer l) {
+        this.previousLayer = l;
+    }
+
+    public void execute() {
+        int i, j;
+        double new_value;
+        for(i = 0; i < getHeight(); i++)
+        {
+            for(j = 0; j < getWidth(); j++)
+            {
+                new_value = 0.0;
+                for(int l = 0; l < previousLayer.getHeight(); l++)
+                    for(int m = 0; m < previousLayer.getWidth(); m++)
+                        new_value += neurons[i][j].weights[l][m] * previousLayer.getNeuron(l, m).value;
+
+                new_value += this.getNeuron(i, j).bias;
+
+                neurons[i][j].value = tf.evaluate(new_value);
+            }
+        }
+    }
+
     public int getHeight() {
         return this.noy;
     }
@@ -44,7 +69,6 @@ public class FullyConnectedLayer implements Layer {
     public Neuron[][] getNeurons() {
         return this.neurons;
     }
-
 
     public Neuron getNeuron(int i, int j) {
         return this.neurons[i][j];

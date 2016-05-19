@@ -12,4 +12,6 @@ public interface Layer {
     public Neuron[][] getNeurons();
     public Neuron getNeuron(int i, int j);
     public TransferFunction getTransferFunction();
+    public void connectPreviousLayer(Layer l);
+    public void execute();
 }
