@@ -50,7 +50,7 @@ public class MainController implements Initializable {
         graph.setData(lineChartData);
         graph.setTitle("Training instances");
         graph.createSymbolsProperty();
-        series1 = new LineChart.Series<Double, Double>();
+        series1 = new LineChart.Series<>();
         series1.setName("Training set");
         lineChartData.add(series1);
 
@@ -82,24 +82,11 @@ public class MainController implements Initializable {
         NeuralNetwork net = new NeuralNetwork(layers, 0.5);
 
 		/* Learning */
-        for (int i = 0; i < 200000; i++) {
-            //mainTextArea.appendText("\nIteration " + i);
-            if(i % 5000 == 0) {
-                System.out.println("Iteration " + i);
-            }
-            double[][] inputs = new double[][]{
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())}
-            };
-            double[][] _inputs = new double[][]{
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())},
-                    {Math.round(Math.random()), Math.round(Math.random()), Math.round(Math.random())}
-            };
+        for (int i = 0; i < 300000; i++) {
+            double[][] inputs = new double[6][6];
+            Matrix.initMat(inputs);
+            double[][] _inputs = new double[3][3];
+            Matrix.initMat(_inputs);
             double[][] output = new double[1][1];
             double error;
 
@@ -116,7 +103,7 @@ public class MainController implements Initializable {
             error = net.backPropagate(inputs, output);
             //System.out.println("\nError at step " + i + " is " + error + "\n");
             if(i % 200 == 0) {
-                series1.getData().add(new XYChart.Data<Double, Double>(Double.valueOf(i), error));
+                series1.getData().add(new XYChart.Data<>((double)i, error));
                 if(error > .9) {
                     System.out.println(Matrix.format(inputs));
                     System.out.println("Output ("+i+"): " + output[0][0] + ", error: " + error);
