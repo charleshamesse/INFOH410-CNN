@@ -14,8 +14,11 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -31,11 +34,15 @@ public class MainController implements Initializable {
     private ScatterChart<Number, Number> matrixGraph;
 
     @FXML
-    private ImageView inputImageView;
+    private HBox imageViewBox;
+
+    @FXML
+    private TextField imageViewCaption;
 
     ObservableList<XYChart.Series<Double, Double>> lineChartData;
     LineChart.Series<Double, Double> series1;
     GrayImage inputImage;
+    NeuralNetwork net;
 
 
     public MainController() {
@@ -53,37 +60,37 @@ public class MainController implements Initializable {
 
         // Images
         inputImage  = new GrayImage("res/plane.jpeg");
+
+        // NeuralNetwork
+
+        TransferFunction tf = new Sigmoid();
+
+        Layer[] layers = new Layer[]{
+                new FullyConnectedLayer(new int[]{0, 0}, new int[]{20, 20}, tf),
+                new ConvolutionalLayer(new int[]{20, 20}, new int[]{20, 20}, tf),
+                new MaxPoolingLayer(new int[]{20, 20}, new int[]{10, 10}, tf),
+                new FullyConnectedLayer(new int[]{10, 10}, new int[]{1, 1}, tf)
+        };
+
+        net = new NeuralNetwork(layers, 0.01);
     }
     @FXML
     private void train() {
         mainTextArea.appendText("Starting learn process..\n");
-        run();
+        trainNetwork(net);
     }
 
 
     @FXML
     private void test() {
-        inputImage.subSample(50, 50);
-        Image image = SwingFXUtils.toFXImage(inputImage.getBufferedImage(), null);
-        inputImageView.setImage(image);
-        mainTextArea.appendText("Not implemented yet..\n");
+        mainTextArea.appendText("Starting test process..\n");
+        testNetwork(net);
     }
 
-    private void run() {
-        TransferFunction tf = new Sigmoid();
-        Layer topLayer = new FullyConnectedLayer(new int[]{0, 0}, new int[]{20, 20}, tf);
-        Layer midLayer = new MaxPoolingLayer(new int[]{20, 20}, new int[]{10, 10}, tf);
-        Layer bottomLayer = new FullyConnectedLayer(new int[]{10, 10}, new int[]{1, 1}, tf);
-        Layer[] layers = new Layer[]{
-                topLayer,
-                midLayer,
-                bottomLayer
-        };
-
-        NeuralNetwork net = new NeuralNetwork(layers, 0.01);
+    private void trainNetwork(NeuralNetwork net) {
 
 		/* Learning */
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < 5000; i++) {
             double[][] inputs = new double[20][20];
             Matrix.initMat(inputs);
             double[][] output = new double[1][1];
@@ -92,33 +99,40 @@ public class MainController implements Initializable {
             output[0][0] = generateOutput(inputs);
 
             error = net.backPropagate(inputs, output);
-            //System.out.println("\nError at step " + i + " is " + error + "\n");
             if(i % 200 == 0) {
                 series1.getData().add(new XYChart.Data<>((double)i, error));
-                GrayImage layerImage = new GrayImage(bottomLayer.getNeuronValues());
-                layerImage.superSample(200, 200);
-                Image image = SwingFXUtils.toFXImage(layerImage.getBufferedImage(), null);
-                inputImageView.setImage(image);
-                if(error > .9) {
-                    //System.out.println(Matrix.format(inputs));
-                    //System.out.println("Output ("+i+"): " + output[0][0] + ", error: " + error);
-                }
+            }
+            if(i % 1000 == 0) {
+                System.out.println("Iteration " + i);
             }
         }
 
         mainTextArea.appendText("Learning completed!\n");
 
-		/* Test */
-        /*
-        double[][] inputs = new double[][]{
-                {1, 0, 0},
-                {0, 0, 0},
-                {0, 0, 1}
-        };
-        double[][] output = net.execute(inputs);
-        mainTextArea.appendText("Test result: " + Math.round(output[0][0]) + " (" + output[0][0] + ")\n");
+    }
 
-        */
+    private void testNetwork(NeuralNetwork net) {
+
+        double[][] inputs = new double[20][20];
+        Matrix.initMat(inputs);
+
+        double[][] output = net.execute(inputs);
+
+        mainTextArea.appendText("Test result: " + output[0][0] + "\n");
+        imageViewBox.getChildren().clear();
+
+        imageViewCaption.setText("Layers: ");
+
+        // Plot layer neurons
+        for(Layer l : net.getLayers()) {
+            GrayImage layerImage = new GrayImage(l.getNeuronValues());
+            layerImage.superSample(200, 200);
+            Image image = SwingFXUtils.toFXImage(layerImage.getBufferedImage(), null);
+            ImageView imageView = new ImageView();
+            imageView.setImage(image);
+            imageViewBox.getChildren().add(imageView);
+            imageViewCaption.appendText(l.getClass().getName() + " ");
+        }
     }
 
     private double generateOutput(double[][] input) {

@@ -9,12 +9,7 @@ import NeuralNetwork.Utils.Matrix;
  */
 public class ConvolutionalLayer extends Layer {
 
-    private int nix, niy, nox, noy;
-    private double[] w, b;
-    private TransferFunction tf;
-    private Neuron[][] neurons;
     private double[][] kernel;
-    private Layer previousLayer;
     private int stride;
 
     /**
@@ -30,7 +25,7 @@ public class ConvolutionalLayer extends Layer {
         // Kernel with F = 3
         this.kernel = new double[][]{
                 {0.0, 0.0, 0.0},
-                {0.0, 1.0, 0.0},
+                {-1.0, 1.0, -1.0},
                 {0.0, 0.0, 0.0}
         };
 
@@ -55,8 +50,9 @@ public class ConvolutionalLayer extends Layer {
                 // Weight does not apply if we're on the border
                 for(l = 0; l < kernel.length; ++l) {
                     for(m = 0; m < kernel[0].length; ++m) {
-                        if(stride*i+l < getHeight() && stride*j+m < getWidth())
+                        if(stride*i+l < getHeight() && stride*j+m < getWidth()) {
                             new_value += neurons[i][j].weights[stride*i+l][stride*j+m] * input[stride*i+l][stride*j+m] * kernel[l][m];
+                        }
                     }
                 }
 
@@ -64,7 +60,6 @@ public class ConvolutionalLayer extends Layer {
                 neurons[i][j].value = tf.evaluate(new_value);
             }
         }
-
 
     }
     private Double[][] applyPadding() {
@@ -79,26 +74,6 @@ public class ConvolutionalLayer extends Layer {
             }
         }
         return new_input;
-    }
-
-    public int getHeight() {
-        return this.noy;
-    }
-    public int getWidth() {
-        return this.nox;
-    }
-
-    public Neuron[][] getNeurons() {
-        return this.neurons;
-    }
-
-
-    public Neuron getNeuron(int i, int j) {
-        return this.neurons[i][j];
-    }
-
-    public TransferFunction getTransferFunction() {
-        return this.tf;
     }
 
 }

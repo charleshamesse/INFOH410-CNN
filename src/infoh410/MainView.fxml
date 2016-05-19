@@ -10,8 +10,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.chart.ScatterChart?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.TextField?>
 <GridPane fx:controller="infoh410.MainController"
             xmlns:fx="http://javafx.com/fxml">
     <children>
@@ -26,9 +25,9 @@
             <xAxis><NumberAxis label="Iteration" lowerBound="0" upperBound="3" tickUnit="1"/></xAxis>
             <yAxis><NumberAxis label="Error" lowerBound="0" upperBound="3" tickUnit="1"/></yAxis>
         </LineChart>
-        <ImageView fx:id="inputImageView" GridPane.rowIndex="3" GridPane.columnIndex="0">
-        </ImageView>
-        <TextArea fx:id="mainTextArea" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <HBox alignment="CENTER" fx:id="imageViewBox" GridPane.columnIndex="0" GridPane.rowIndex="2"></HBox>
+        <TextField fx:id="imageViewCaption" GridPane.rowIndex="3" GridPane.columnIndex="0"></TextField>
+        <TextArea fx:id="mainTextArea" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
     </children>
 
     <columnConstraints>
@@ -38,6 +37,7 @@
         <RowConstraints maxHeight="30.0" minHeight="30.0"  vgrow="SOMETIMES" />
         <RowConstraints maxHeight="400.0" minHeight="200.0" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="400.0" minHeight="200.0" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="30.0" minHeight="30.0" vgrow="SOMETIMES" />
         <RowConstraints minHeight="100.0"   vgrow="ALWAYS" />
         <RowConstraints maxHeight="200.0" minHeight="100.0"   vgrow="SOMETIMES" />
     </rowConstraints>

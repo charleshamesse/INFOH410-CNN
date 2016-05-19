@@ -21,4 +21,8 @@ public class Neuron
             for(int j = 0; j < weights[i].length; j++)
                 weights[i][j] = Math.random() / 10000000000000.0;
     }
+
+    public String toString() {
+        return "Neuron";
+    }
 }

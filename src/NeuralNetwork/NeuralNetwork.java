@@ -139,53 +139,8 @@ public class NeuralNetwork implements Serializable {
         return error;
     }
 
-
-    /**
-     * Save trained network
-     *
-     * @param path Path nel quale salvare la rete MLP
-     * @return true se salvata correttamente
-     */
-    public boolean save(String path)
-    {
-        try
-        {
-            FileOutputStream fout = new FileOutputStream(path);
-            ObjectOutputStream oos = new ObjectOutputStream(fout);
-            oos.writeObject(this);
-            oos.close();
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-
-    /**
-     * Load an existing network
-     * @param path
-     * @return
-     */
-    public static NeuralNetwork load(String path)
-    {
-        try
-        {
-            NeuralNetwork net;
-
-            FileInputStream fin = new FileInputStream(path);
-            ObjectInputStream oos = new ObjectInputStream(fin);
-            net = (NeuralNetwork) oos.readObject();
-            oos.close();
-
-            return net;
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
+    public Layer[] getLayers() {
+        return layers;
     }
 
     public double getLearningRate()
