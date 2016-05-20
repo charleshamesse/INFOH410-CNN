@@ -43,6 +43,7 @@ public class MainController implements Initializable {
     LineChart.Series<Double, Double> series1;
     GrayImage inputImage;
     NeuralNetwork net;
+    int size;
 
 
     public MainController() {
@@ -62,17 +63,17 @@ public class MainController implements Initializable {
         inputImage  = new GrayImage("res/plane.jpeg");
 
         // NeuralNetwork
+        size = 4;
 
         TransferFunction tf = new Sigmoid();
 
         Layer[] layers = new Layer[]{
-                new FullyConnectedLayer(new int[]{0, 0}, new int[]{20, 20}, tf),
-                new ConvolutionalLayer(new int[]{20, 20}, new int[]{20, 20}, tf),
-                new MaxPoolingLayer(new int[]{20, 20}, new int[]{10, 10}, tf),
-                new FullyConnectedLayer(new int[]{10, 10}, new int[]{1, 1}, tf)
+                new FullyConnectedLayer(new int[]{0, 0}, new int[]{1, 1}, tf),
+                new FullyConnectedLayer(new int[]{1, 1}, new int[]{20, 1}, tf),
+                new FullyConnectedLayer(new int[]{20, 1}, new int[]{1, 1}, tf)
         };
 
-        net = new NeuralNetwork(layers, 0.01);
+        net = new NeuralNetwork(layers, 0.05);
     }
     @FXML
     private void train() {
@@ -89,20 +90,31 @@ public class MainController implements Initializable {
 
     private void trainNetwork(NeuralNetwork net) {
 
+        int group_size = 200;
+        double group_error = 0;
+
 		/* Learning */
-        for (int i = 0; i < 5000; i++) {
-            double[][] inputs = new double[20][20];
+        for (int i = 0; i < 200000; i++) {
+
+            double[][] inputs = new double[1][1];
             Matrix.initMat(inputs);
+
             double[][] output = new double[1][1];
+            output[0][0] = trainingFunction(inputs, false); //generateOutput(inputs);
+
+
             double error;
-
-            output[0][0] = generateOutput(inputs);
-
             error = net.backPropagate(inputs, output);
-            if(i % 200 == 0) {
-                series1.getData().add(new XYChart.Data<>((double)i, error));
+
+            if(i % group_size == 0 && i > 0) {
+                group_error /= group_size;
+                series1.getData().add(new XYChart.Data<>((double)i, group_error));
+                group_error = 0;
             }
-            if(i % 1000 == 0) {
+            else
+                group_error += error;
+
+            if(i % 5000 == 0) {
                 System.out.println("Iteration " + i);
             }
         }
@@ -112,13 +124,14 @@ public class MainController implements Initializable {
     }
 
     private void testNetwork(NeuralNetwork net) {
-
-        double[][] inputs = new double[20][20];
+        double[][] inputs = new double[1][1];
         Matrix.initMat(inputs);
 
         double[][] output = net.execute(inputs);
-
-        mainTextArea.appendText("Test result: " + output[0][0] + "\n");
+        double result = trainingFunction(inputs, true);
+        mainTextArea.appendText("Expected result: " + result + "\n");
+        mainTextArea.appendText("Actual result: " + output[0][0] + "\n");
+        mainTextArea.appendText("Error: " + Math.abs((output[0][0]-result)/result)*100 + "% \n");
         imageViewBox.getChildren().clear();
 
         imageViewCaption.setText("Layers: ");
@@ -126,7 +139,7 @@ public class MainController implements Initializable {
         // Plot layer neurons
         for(Layer l : net.getLayers()) {
             GrayImage layerImage = new GrayImage(l.getNeuronValues());
-            layerImage.superSample(200, 200);
+            layerImage.superSample(300, 300);
             Image image = SwingFXUtils.toFXImage(layerImage.getBufferedImage(), null);
             ImageView imageView = new ImageView();
             imageView.setImage(image);
@@ -138,13 +151,28 @@ public class MainController implements Initializable {
     private double generateOutput(double[][] input) {
         int count = 0;
         int current = 0;
-        for(int i = 0; i < input.length / 2; ++i) {
-            for(int j = 0; j < input.length; ++j) {
-                ++count;
-                if(input[i][j] == 1)
-                    ++current;
+        for(int i = 0; i < input.length; ++i) {
+            for(int j = 0; j < input[0].length; ++j) {
+                if(i == j) { //if(input[i][j] == 1)
+                    ++count;
+                    if (input[i][j] == 1)
+                        ++current;
+                }
             }
         }
         return (current / count > 0.9) ? 1.0 : 0.0;
+    }
+
+    private double trainingFunction(double[][] inputs, Boolean print) {
+        double value = 0;
+        double max = 0;
+        for(int i = 0; i < inputs.length; ++i) {
+            for(int j = 0; j < inputs[0].length; ++j) {
+                if(print) System.out.println("Cell: " + i + ", " + j);
+                value += (1 + Math.sin(inputs[i][j] * 2 * Math.PI / inputs.length))/2; //* Math.cos(j * 2 * Math.PI / inputs[0].length)
+                max += 1;
+            }
+        }
+        return value / max;
     }
 }

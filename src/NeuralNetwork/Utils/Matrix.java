@@ -40,7 +40,14 @@ public class Matrix {
     public static void initMat(double[][] mat){
         for(int j=0;j<mat.length;j++){
             for(int k=0;k<mat[j].length;k++){
-                mat[j][k] = Math.round(Math.random());
+                mat[j][k] = Math.random();
+            }
+        }
+    }
+    public static void initSineMat(double[][] mat){
+        for(int j=0;j<mat.length;j++){
+            for(int k=0;k<mat[j].length;k++){
+                mat[j][k] = (1 + Math.sin(mat[j][k] * 6.28 / mat.length) * Math.cos(mat[j][k] * 6.28 / mat[0].length))/2;
             }
         }
     }

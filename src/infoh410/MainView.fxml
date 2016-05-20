@@ -22,8 +22,8 @@
             </HBox>
         </ToolBar>
         <LineChart fx:id="graph" GridPane.columnIndex="0" GridPane.rowIndex="1">
-            <xAxis><NumberAxis label="Iteration" lowerBound="0" upperBound="3" tickUnit="1"/></xAxis>
-            <yAxis><NumberAxis label="Error" lowerBound="0" upperBound="3" tickUnit="1"/></yAxis>
+            <xAxis><NumberAxis label="Iteration" lowerBound="0" tickUnit="1"/></xAxis>
+            <yAxis><NumberAxis label="Error" lowerBound="0" upperBound="1" tickUnit=".1"/></yAxis>
         </LineChart>
         <HBox alignment="CENTER" fx:id="imageViewBox" GridPane.columnIndex="0" GridPane.rowIndex="2"></HBox>
         <TextField fx:id="imageViewCaption" GridPane.rowIndex="3" GridPane.columnIndex="0"></TextField>
